@@ -13,6 +13,13 @@ const getBase64Data = (dataUrl: string): string => {
 };
 
 /**
+ * Helper to get API Key from local storage or environment
+ */
+const getApiKey = (): string => {
+  return localStorage.getItem('gemini_api_key') || process.env.API_KEY || '';
+};
+
+/**
  * Generates a product mockup by compositing multiple logos onto a product image.
  */
 export const generateMockup = async (
@@ -23,7 +30,7 @@ export const generateMockup = async (
 ): Promise<string> => {
   try {
     // Create instance here to get latest key
-    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+    const ai = new GoogleGenAI({ apiKey: getApiKey() });
     const model = 'gemini-3-pro-image-preview';
 
     // 1. Add Product Base
@@ -106,7 +113,7 @@ export const generateMockup = async (
  */
 export const generateAsset = async (prompt: string, type: 'logo' | 'product'): Promise<string> => {
    try {
-    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+    const ai = new GoogleGenAI({ apiKey: getApiKey() });
     const model = 'gemini-3-pro-image-preview';
     
     const enhancedPrompt = type === 'logo' 
@@ -147,7 +154,7 @@ export const generateRealtimeComposite = async (
     prompt: string = "Make this look like a real photo"
   ): Promise<string> => {
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+      const ai = new GoogleGenAI({ apiKey: getApiKey() });
       const model = 'gemini-3-pro-image-preview';
   
       const parts = [

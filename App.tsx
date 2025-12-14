@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
 */
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Layout, Box, Image as ImageIcon, Wand2, Layers, Plus, Trash2, Download, History, Sparkles, Shirt, Move, Maximize, RotateCcw, Zap, Cpu, ArrowRight, Globe, Scan, Camera, Aperture, Repeat, SprayCan, Triangle, Package, Menu, X, Check, MousePointer2, Undo2, Redo2, ZoomIn, ZoomOut, MoveUp, MoveDown, BringToFront, SendToBack, ChevronsUp, ChevronsDown, ChevronUp, ChevronDown, RotateCw, Sun, Grid3x3, PaintBucket, Palette, Loader2, MessageSquarePlus, Pencil, Droplets, Contrast } from 'lucide-react';
+import { Layout, Box, Image as ImageIcon, Wand2, Layers, Plus, Trash2, Download, History, Sparkles, Shirt, Move, Maximize, RotateCcw, Zap, Cpu, ArrowRight, Globe, Scan, Camera, Aperture, Repeat, SprayCan, Triangle, Package, Menu, X, Check, MousePointer2, Undo2, Redo2, ZoomIn, ZoomOut, MoveUp, MoveDown, BringToFront, SendToBack, ChevronsUp, ChevronsDown, ChevronUp, ChevronDown, RotateCw, Sun, Grid3x3, PaintBucket, Palette, Loader2, MessageSquarePlus, Pencil, Droplets, Contrast, Settings } from 'lucide-react';
 import { Button } from './components/Button';
 import { FileUploader } from './components/FileUploader';
 import { CameraAngleSelector } from './components/CameraAngleSelector';
@@ -496,6 +496,10 @@ export default function App() {
 
   const [prompt, setPrompt] = useState('');
   const [loading, setLoading] = useState<LoadingState>({ isGenerating: false, message: '' });
+  
+  // Settings / API Key State
+  const [showSettings, setShowSettings] = useState(false);
+  const [userApiKey, setUserApiKey] = useState(localStorage.getItem('gemini_api_key') || '');
 
   // Sync ref
   useEffect(() => {
@@ -504,6 +508,17 @@ export default function App() {
 
   // API Key Management
   const { showApiKeyDialog, setShowApiKeyDialog, validateApiKey, handleApiKeyDialogContinue } = useApiKey();
+
+  // Helper to check for any valid key (Local or Managed)
+  const checkApiKey = async (): Promise<boolean> => {
+     if (localStorage.getItem('gemini_api_key')) return true;
+     return await validateApiKey();
+  };
+  
+  const handleSaveKey = () => {
+     localStorage.setItem('gemini_api_key', userApiKey);
+     setShowSettings(false);
+  };
 
   // API Error Handling Logic
   const handleApiError = (error: any) => {
@@ -705,7 +720,7 @@ export default function App() {
   // -- IN-STUDIO ASSET GENERATION --
   const handleStudioAssetGenerate = async () => {
     if (!genPrompt) return;
-    if (!(await validateApiKey())) return;
+    if (!(await checkApiKey())) return;
 
     setIsGeneratingAsset(true);
     try {
@@ -921,7 +936,7 @@ export default function App() {
     }
 
     // Check API Key before proceeding
-    if (!(await validateApiKey())) {
+    if (!(await checkApiKey())) {
       return;
     }
 
@@ -963,6 +978,35 @@ export default function App() {
       {/* API Key Dialog */}
       {showApiKeyDialog && (
         <ApiKeyDialog onContinue={handleApiKeyDialogContinue} />
+      )}
+
+      {/* Settings Modal */}
+      {showSettings && (
+        <div className="fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in">
+           <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-2xl border border-black/10">
+              <div className="flex justify-between items-center mb-4">
+                 <h3 className="text-lg font-bold flex items-center gap-2"><Settings size={18}/> Settings</h3>
+                 <button onClick={() => setShowSettings(false)} className="p-1 hover:bg-black/5 rounded-full"><X size={20}/></button>
+              </div>
+              <div className="mb-4">
+                  <label className="block text-sm font-medium text-zinc-700 mb-1">Custom API Key</label>
+                  <p className="text-xs text-zinc-500 mb-2">Enter your Gemini API key to override the default system key. This is saved locally in your browser.</p>
+                  <input 
+                    type="password" 
+                    value={userApiKey}
+                    onChange={(e) => setUserApiKey(e.target.value)}
+                    className="w-full bg-zinc-50 border border-zinc-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-black focus:outline-none"
+                    placeholder="AIzaSy..."
+                  />
+              </div>
+              <div className="flex gap-3 justify-end">
+                 <Button variant="ghost" onClick={() => setShowSettings(false)}>Cancel</Button>
+                 <Button onClick={handleSaveKey}>
+                    Save Key
+                 </Button>
+              </div>
+           </div>
+        </div>
       )}
       
       {/* AI Logo Generation Modal */}
@@ -1141,6 +1185,10 @@ export default function App() {
                 <Sparkles size={14}/>
                 <span>PRO</span>
               </div>
+              <div className="w-px h-4 bg-black/10"></div>
+              <button onClick={() => setShowSettings(true)} className="text-zinc-500 hover:text-black transition-colors" title="Settings / API Key">
+                  <Settings size={16} />
+              </button>
            </div>
         </div>
 
@@ -1206,7 +1254,7 @@ export default function App() {
                     onAdd={(a) => setAssets(prev => [...prev, a])}
                     onRemove={(id) => setAssets(prev => prev.filter(a => a.id !== id))}
                     onRename={handleRenameAsset}
-                    validateApiKey={validateApiKey}
+                    validateApiKey={checkApiKey}
                     onApiError={handleApiError}
                   />
 
@@ -1219,7 +1267,7 @@ export default function App() {
                     onAdd={(a) => setAssets(prev => [...prev, a])}
                     onRemove={(id) => setAssets(prev => prev.filter(a => a.id !== id))}
                     onRename={handleRenameAsset}
-                    validateApiKey={validateApiKey}
+                    validateApiKey={checkApiKey}
                     onApiError={handleApiError}
                   />
                 </div>
