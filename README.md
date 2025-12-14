@@ -2,7 +2,7 @@
 
 **MerchMaster** is a professional-grade web application that leverages Google's Gemini AI models to generate photorealistic product mockups. It combines a drag-and-drop design studio with advanced generative AI to composite logos onto products, respecting lighting, texture, warping, and perspective.
 
-![MerchMaster Banner](https://via.placeholder.com/1200x400.png?text=MerchMaster+AI+Studio)
+![MerchMaster Preview](https://www.merch-master.vercel.app/)
 
 ## 🚀 Features
 
