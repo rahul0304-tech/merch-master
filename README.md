@@ -40,7 +40,7 @@
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/your-username/merch-master.git
+   git clone https://github.com/rahul0304-tech/merch-master.git
    cd merch-master
    ```
 
@@ -101,9 +101,4 @@ Click **Generate Mockup**. The AI will analyze your canvas layout and render a h
 
 ## ⚠️ Important Notes
 
-- **Billing**: The `gemini-3-pro-image-preview` model is a premium model. Ensure your Google Cloud project has billing enabled.
 - **Content Policy**: Do not generate content that infringes on intellectual property or violates safety guidelines.
-
-## 📄 License
-
-This project is licensed under the Apache 2.0 License.
